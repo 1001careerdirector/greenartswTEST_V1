@@ -644,6 +644,8 @@
       font-size: 12px;
       font-weight: 900;
       white-space: nowrap;
+      cursor: default;
+      user-select: none;
     }
 
     .cloud-mini {
@@ -2265,37 +2267,37 @@
           </div>
           <div class="evidence-course-selector" aria-label="현상태 비교 훈련과정 선택">
             <div class="course-toolbar">
-              <a class="cloud-drive-button" href="https://drive.google.com/drive/folders/1ldtAUYWl4gVZ1nUA_0E5oFktnhLPFchR" target="_blank" rel="noopener">
+              <div class="cloud-drive-button" aria-label="Google Drive 과정 공간 표시">
                 <span class="cloud-mini" aria-hidden="true"></span>
                 구글 드라이브 과정 공간
-              </a>
+              </div>
             </div>
             <div class="course-grid">
-              <article class="course-card" role="button" tabindex="0" aria-pressed="true" data-course-name="AI활용 기업맞춤 1차" data-course-count="산출물 19 / 계획 20">
+              <article class="course-card" role="button" tabindex="0" aria-pressed="true" data-course-id="biz1" data-course-name="AI활용 기업맞춤 1차" data-course-count="산출물 19 / 계획 20">
                 <div class="course-badges">
                   <span class="course-badge">기업맞춤 1차</span>
                   <span class="course-badge secondary">출판영상</span>
                 </div>
                 <h3>AI활용 기업맞춤 1차</h3>
-                <p>훈련과정으로 이동 ↗</p>
+                <p>현상태 선택</p>
               </article>
 
-              <article class="course-card" role="button" tabindex="0" aria-pressed="false" data-course-name="AI활용 기업맞춤 2차" data-course-count="산출물 0 / 계획 20">
+              <article class="course-card" role="button" tabindex="0" aria-pressed="false" data-course-id="biz2" data-course-name="AI활용 기업맞춤 2차" data-course-count="산출물 0 / 계획 20">
                 <div class="course-badges">
                   <span class="course-badge">기업맞춤 2차</span>
                   <span class="course-badge secondary">출판영상</span>
                 </div>
                 <h3>AI활용 기업맞춤 2차</h3>
-                <p>훈련과정으로 이동 ↗</p>
+                <p>현상태 선택</p>
               </article>
 
-              <article class="course-card" role="button" tabindex="0" aria-pressed="false" data-course-name="디자이너를 위한 AI 활용 출판 편집 실무" data-course-count="산출물 8 / 계획 20">
+              <article class="course-card" role="button" tabindex="0" aria-pressed="false" data-course-id="designer-ai" data-course-name="디자이너를 위한 AI 활용 출판 편집 실무" data-course-count="산출물 8 / 계획 20">
                 <div class="course-badges">
                   <span class="course-badge">훈련이수자</span>
                   <span class="course-badge secondary">출판</span>
                 </div>
                 <h3>디자이너를 위한 AI 활용 출판 편집 실무</h3>
-                <p>훈련과정으로 이동 ↗</p>
+                <p>현상태 선택</p>
               </article>
             </div>
           </div>
@@ -2310,7 +2312,7 @@
                   <p>평가체계 기준 원천</p>
                 </div>
               </div>
-              <div class="folder-tree" aria-label="기준 파일 목록">
+              <div id="standardTree" class="folder-tree" aria-label="기준 파일 목록">
                 <details class="folder-node" open>
                   <summary>
                     <span class="folder-caret" aria-hidden="true"></span>
@@ -2341,7 +2343,7 @@
                   </div>
                 </div>
               </div>
-              <div class="folder-tree" aria-label="로컬문서 파일 목록">
+              <div id="localTree" class="folder-tree" aria-label="로컬문서 파일 목록">
                 <details class="folder-node" open>
                   <summary>
                     <span class="folder-caret" aria-hidden="true"></span>
@@ -2397,7 +2399,7 @@
                   <p>기관 greenartsw 공유 채널</p>
                 </div>
               </div>
-              <div class="folder-tree" aria-label="공유문서 파일 목록">
+              <div id="driveTree" class="folder-tree" aria-label="공유문서 파일 목록">
                 <details class="folder-node" open>
                   <summary>
                     <span class="folder-caret" aria-hidden="true"></span>
@@ -2439,7 +2441,7 @@
                   <p>평가 제출/출력 묶음</p>
                 </div>
               </div>
-              <div class="folder-tree" aria-label="보관문서 파일 목록">
+              <div id="archiveTree" class="folder-tree" aria-label="보관문서 파일 목록">
                 <details class="folder-node" open>
                   <summary>
                     <span class="folder-caret" aria-hidden="true"></span>
@@ -2910,6 +2912,155 @@
     const courseCards = document.querySelectorAll(".course-card[data-course-name]");
     const selectedCourseName = document.querySelector("#selectedCourseName");
     const selectedCourseCount = document.querySelector("#selectedCourseCount");
+    const evidenceTrees = {
+      standard: document.querySelector("#standardTree"),
+      local: document.querySelector("#localTree"),
+      drive: document.querySelector("#driveTree"),
+      archive: document.querySelector("#archiveTree")
+    };
+
+    const courseEvidence = {
+      biz1: {
+        standard: [
+          {
+            name: "자체점검내역서 기준 묶음",
+            count: "4",
+            files: [
+              { name: "훈련과정 평가체계 개요 및 평가증빙자료", status: "ok" },
+              { name: "계획-실행-결과분석-환류 기준표", status: "ok" },
+              { name: "평가증빙 체크 항목", status: "ok" },
+              { name: "보완 의견 반영본", status: "wait", label: "확인" }
+            ]
+          }
+        ],
+        local: [
+          {
+            name: "Ⅱ. 평가계획",
+            count: "1",
+            files: [{ name: "평가계획서.hwp", status: "ok" }]
+          },
+          {
+            name: "Ⅱ. 평가실행_DX_제외",
+            count: "1",
+            files: [{ name: "평가도구_평가지.hwp", status: "ok" }]
+          },
+          {
+            name: "Ⅲ. 평가결과관리",
+            count: "1",
+            files: [{ name: "종합의견서_초안.docx", status: "ok" }]
+          },
+          {
+            name: "Ⅳ. 평가결과환류",
+            count: "0",
+            files: [{ name: "환류보고서 / 개선계획서", status: "missing" }]
+          }
+        ],
+        drive: [
+          {
+            name: "사전진단평가 Google Form 세트",
+            count: "19/20",
+            files: [
+              { name: "[①벡터드로잉] - 2026.02.25(수)", status: "ok" },
+              { name: "[①벡터드로잉] - 2026.02.25(수)(응답)", status: "ok" },
+              { name: "[②디지털 이미지 처리] - 2026.03.10(화)", status: "ok" },
+              { name: "[②디지털 이미지 처리] - 2026.03.10(화)(응답)", status: "ok" },
+              { name: "[③InDesign 활용 편집 디자인] - 2026.03.18(수)", status: "ok" },
+              { name: "[③InDesign 활용 편집 디자인] - 2026.03.18(수)(응답)", status: "ok" },
+              { name: "[④AI 활용 출판물 디자인 기초] - 2026.03.24(화)", status: "ok" },
+              { name: "[④AI 활용 출판물 디자인 기초] - 2026.03.24(화)(응답)", status: "ok" },
+              { name: "[⑤Book Design 기획 및 편집실습] - 2026.03.26(목)", status: "ok" },
+              { name: "[⑤Book Design 기획 및 편집실습] - 2026.03.26(목)(응답)", status: "ok" },
+              { name: "[⑥ePub 제작 및 Interactive PDF] - 2026-04-14(화)", status: "ok" },
+              { name: "[⑥ePub 제작 및 Interactive PDF] - 2026-04-14(화)(응답)", status: "ok" },
+              { name: "[⑦광고·브랜딩 콘텐츠] - 2026.04.24(금)", status: "ok" },
+              { name: "[⑦광고·브랜딩 콘텐츠] - 2026.04.24(금)(응답)", status: "ok" },
+              { name: "[⑧프로젝트1 공공기관출판기획 및 편집] - 2026.05.28(목)", status: "ok" },
+              { name: "[⑧프로젝트1 공공기관출판기획 및 편집] - 2026.05.28(목)(응답)", status: "ok" },
+              { name: "[⑨프로젝트2 동화책 디자인 및 활동지(EP)] - 2026.06.26(금)", status: "ok" },
+              { name: "[⑨프로젝트2 동화책 디자인 및 활동지(EP)] - 2026.06.26(금)(응답)", status: "ok" },
+              { name: "[⑩프로젝트3 브랜드 캠페인 광고 콘텐츠 제작] - 2026.07.21(화)", status: "ok" },
+              { name: "[⑩프로젝트3 브랜드 캠페인 광고 콘텐츠 제작](응답)", status: "missing" }
+            ]
+          }
+        ],
+        archive: [
+          {
+            name: "최종 증빙철 출력/취합",
+            count: "0/5",
+            files: [
+              { name: "안내문 / 평가지 출력본", status: "wait", label: "대기" },
+              { name: "HWP 최종본", status: "missing" },
+              { name: "Google Docs / OfficeDoc 최종본", status: "wait", label: "확인" },
+              { name: "PPT / PDF 보고 묶음", status: "missing" },
+              { name: "3공 파일 철번호 / 프린트 확인", status: "wait", label: "수기" }
+            ]
+          }
+        ]
+      },
+      biz2: {
+        standard: [
+          {
+            name: "자체점검내역서 기준 묶음",
+            count: "0/4",
+            files: [{ name: "과정 기준 문서 매핑 대기", status: "wait", label: "대기" }]
+          }
+        ],
+        local: [
+          {
+            name: "과정 원본 폴더",
+            count: "0",
+            files: [{ name: "Y: 서버 과정 폴더 확인 대기", status: "wait", label: "대기" }]
+          }
+        ],
+        drive: [
+          {
+            name: "사전진단평가 Google Form 세트",
+            count: "0/20",
+            files: [{ name: "Google Drive 자료 생성 전", status: "missing" }]
+          }
+        ],
+        archive: [
+          {
+            name: "최종 증빙철 출력/취합",
+            count: "0/5",
+            files: [{ name: "최종 보관문서 생성 전", status: "missing" }]
+          }
+        ]
+      },
+      "designer-ai": {
+        standard: [
+          {
+            name: "자체점검내역서 기준 묶음",
+            count: "미집계",
+            files: [{ name: "과정 기준 문서 세부 파일명 매핑 대기", status: "wait", label: "대기" }]
+          }
+        ],
+        local: [
+          {
+            name: "과정 원본 폴더",
+            count: "미집계",
+            files: [{ name: "로컬 실물 파일명 매핑 대기", status: "wait", label: "대기" }]
+          }
+        ],
+        drive: [
+          {
+            name: "Google Drive 자료",
+            count: "8/20",
+            files: [
+              { name: "Drive 자료 8건 확인, 세부 파일명 매핑 필요", status: "wait", label: "확인" },
+              { name: "잔여 12건 확인 필요", status: "missing" }
+            ]
+          }
+        ],
+        archive: [
+          {
+            name: "최종 증빙철 출력/취합",
+            count: "미집계",
+            files: [{ name: "보관문서 실물 파일명 매핑 대기", status: "wait", label: "대기" }]
+          }
+        ]
+      }
+    };
 
     function getTodayInSeoul() {
       const parts = new Intl.DateTimeFormat("en-CA", {
@@ -2972,12 +3123,65 @@
       });
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function renderStatusMark(file) {
+      if (file.status === "ok") return '<span class="status-mark mark-o">O</span>';
+      if (file.status === "missing") return '<span class="status-mark mark-x">X</span>';
+      return `<span class="status-mark mark-dot" aria-label="${escapeHtml(file.label || "대기")}"></span>`;
+    }
+
+    function renderFile(file) {
+      const className = file.status === "ok" ? "file-link" : "file-empty";
+      return [
+        `<span class="${className}">`,
+        '<span class="file-icon"></span>',
+        `<span>${escapeHtml(file.name)}</span>`,
+        renderStatusMark(file),
+        "</span>"
+      ].join("");
+    }
+
+    function renderFolderNode(group, index) {
+      const open = index === 0 ? " open" : "";
+      return [
+        `<details class="folder-node"${open}>`,
+        "<summary>",
+        '<span class="folder-caret" aria-hidden="true"></span>',
+        '<span class="folder-icon" aria-hidden="true"></span>',
+        `<span class="folder-name-text">${escapeHtml(group.name)}</span>`,
+        `<span class="file-count">${escapeHtml(group.count)}</span>`,
+        "</summary>",
+        '<div class="file-list">',
+        group.files.map(renderFile).join(""),
+        "</div>",
+        "</details>"
+      ].join("");
+    }
+
+    function renderEvidence(courseId) {
+      const data = courseEvidence[courseId] || courseEvidence.biz1;
+      Object.entries(evidenceTrees).forEach(([stage, tree]) => {
+        if (!tree || !data[stage]) return;
+        tree.innerHTML = data[stage].map(renderFolderNode).join("");
+      });
+    }
+
     function selectCourse(card) {
       if (!card || !selectedCourseName || !selectedCourseCount) return;
       courseCards.forEach((item) => item.setAttribute("aria-pressed", "false"));
       card.setAttribute("aria-pressed", "true");
       selectedCourseName.textContent = card.dataset.courseName || "훈련과정 선택";
       selectedCourseCount.textContent = card.dataset.courseCount || "산출물 - / 계획 -";
+      renderEvidence(card.dataset.courseId || "biz1");
     }
 
     courseCards.forEach((card) => {
@@ -2989,6 +3193,9 @@
         }
       });
     });
+
+    const initialCourseCard = document.querySelector('.course-card[aria-pressed="true"]') || courseCards[0];
+    if (initialCourseCard) selectCourse(initialCourseCard);
 
     function daysBetween(a, b) {
       const start = new Date(a + "T00:00:00");
